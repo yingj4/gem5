@@ -8,7 +8,7 @@ s.clk_domain.clock = '1GHz'
 s.clk_domain.voltage_domain = VoltageDomain()
 
 s.mem_mode = 'timing'
-s.mem_ranges = [AddRange('512MB')]
+s.mem_ranges = [AddrRange('512MB')]
 
 s.cpu = X86TimingSimpleCPU()
 
