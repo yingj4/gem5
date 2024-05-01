@@ -1,0 +1,50 @@
+import m5
+from m5.objects import *
+
+s = System()
+
+s.clk_domain = SrcClockDomain()
+s.clk_domain.clock = '1GHz'
+s.clk_domain.voltage_domain = VoltageDomain()
+
+s.mem_node = 'timing'
+s.mem_ranges = [AddRange('512MB')]
+
+s.cpu = X86TimingSimpleCPU()
+
+
+s.membus = SystemXBar()
+
+s.cpu.icache_port = s.membus.cpu_side_ports
+s.cpu.dcache_port = s.membus.cpu_side_ports
+
+s.cpu.createInterruptController()
+s.cpu.interrupts[0].pio = s.membus.mem_side_ports
+s.cpu.interrupts[0].int_requestor = s.membus.cpu_side_ports
+s.cpu.interrupts[0].int_responder = s.membus.mem_side_ports
+
+s.system_port = s.membus.cpu_side_ports
+
+s.mem_ctrl = MemCtrl()
+s.mem_ctrl.dram = DDR3_1600_8x8()
+s.mem_ctrl.dram.range = s.mem_ranges[0]
+s.mem_ctrl.port = s.membus.mem_side_ports
+
+binary = "../../../teststest-progs/hello/bin/x86/linux/hello"
+
+s.workload = SEWorkload.init_compatible(binary)
+
+process = Process()
+process.cmd = [binary]
+s.cpu.workload = process
+s.cpu.createThreads()
+
+
+root = Root(full_system = False, system = s)
+m5.instantiate()
+
+
+print("Beginning simulation!")
+exit_event = m5.simulate()
+print('Exiting @ tick {} because {}'
+      .format(m5.curTick(), exit_event.getCause()))
