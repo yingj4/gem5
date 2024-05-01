@@ -30,9 +30,9 @@ s.mem_ctrl.dram = DDR3_1600_8x8()
 s.mem_ctrl.dram.range = s.mem_ranges[0]
 s.mem_ctrl.port = s.membus.mem_side_ports
 
-# thispath = os.path.dirname(os.path.realpath(__file__))
-# binary = os.path.join(thispath, "../../../", "tests/test-progs/hello/bin/x86/linux/hello")
-binary = "/home/gem5/tests/test-progs/hello/bin/x86/linux/hello"
+thispath = os.path.dirname(os.path.realpath(__file__))
+binary = os.path.join(thispath, "../../../", "tests/test-progs/hello/bin/x86/linux/hello")
+# binary = "/home/gem5/tests/test-progs/hello/bin/x86/linux/hello"
 
 s.workload = SEWorkload.init_compatible(binary)
 
