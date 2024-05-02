@@ -39,8 +39,8 @@ class L2Cache(Cache):
     mshrs = 20
     tgts_per_mshr = 12
 
-    def connectCPUSideBus(self, cpu):
+    def connectCPUSideBus(self, bus):
         self.cpu_side = bus.mem_side_ports
     
-    def connectMemSideBus(self, cpu):
+    def connectMemSideBus(self, bus):
         self.mem_side = bus.cpu_side_ports
