@@ -1,48 +1,48 @@
 import m5
 from m5.objects import *
 
-system = System()
+s = System()
 
-system.clk_domain = SrcClockDomain()
-system.clk_domain.clock = '1GHz'
-system.clk_domain.voltage_domain = VoltageDomain()
+s.clk_domain = SrcClockDomain()
+s.clk_domain.clock = '1GHz'
+s.clk_domain.voltage_domain = VoltageDomain()
 
-system.mem_mode = 'timing'
-system.mem_ranges = [AddrRange('512MB')]
+s.mem_mode = 'timing'
+s.mem_ranges = [AddrRange('512MB')]
 
-system.cpu = X86TimingSimpleCPU()
+s.cpu = X86TimingSimpleCPU()
 
 
-system.membus = SystemXBar()
+s.membus = SystemXBar()
 
-system.cpu.icache_port = system.membus.cpu_side_ports
-system.cpu.dcache_port = system.membus.cpu_side_ports
+s.cpu.icache_port = s.membus.cpu_side_ports
+s.cpu.dcache_port = s.membus.cpu_side_ports
 
-system.cpu.createInterruptController()
-system.cpu.interrupts[0].pio = system.membus.mem_side_ports
-system.cpu.interrupts[0].int_requestor = system.membus.cpu_side_ports
-system.cpu.interrupts[0].int_responder = system.membus.mem_side_ports
+s.cpu.createInterruptController()
+s.cpu.interrupts[0].pio = s.membus.mem_side_ports
+s.cpu.interrupts[0].int_requestor = s.membus.cpu_side_ports
+s.cpu.interrupts[0].int_responder = s.membus.mem_side_ports
 
-system.system_port = system.membus.cpu_side_ports
+s.system_port = s.membus.cpu_side_ports
 
-system.mem_ctrl = MemCtrl()
-system.mem_ctrl.dram = DDR3_1600_8x8()
-system.mem_ctrl.dram.range = system.mem_ranges[0]
-system.mem_ctrl.port = system.membus.mem_side_ports
+s.mem_ctrl = MemCtrl()
+s.mem_ctrl.dram = DDR3_1600_8x8()
+s.mem_ctrl.dram.range = s.mem_ranges[0]
+s.mem_ctrl.port = s.membus.mem_side_ports
 
 thispath = os.path.dirname(os.path.realpath(__file__))
 binary = os.path.join(thispath, "../../../", "tests/test-progs/hello/bin/x86/linux/hello")
 # binary = "/home/gem5/tests/test-progs/hello/bin/x86/linux/hello"
 
-system.workload = SEWorkload.init_compatible(binary)
+s.workload = SEWorkload.init_compatible(binary)
 
 process = Process()
 process.cmd = [binary]
-system.cpu.workload = process
-system.cpu.createThreads()
+s.cpu.workload = process
+s.cpu.createThreads()
 
 
-root = Root(full_system = False, system = system)
+root = Root(full_system = False, system = s)
 m5.instantiate()
 
 
