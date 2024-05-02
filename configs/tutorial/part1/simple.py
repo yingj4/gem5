@@ -42,7 +42,7 @@ system.cpu.workload = process
 system.cpu.createThreads()
 
 
-root = Root(full_system = False, system = s)
+root = Root(full_system = False, system = system)
 m5.instantiate()
 
 
