@@ -146,8 +146,8 @@ system.mem_ranges = [AddrRange("512MB")]  # Create an address range
 system.cpu = X86TimingSimpleCPU()
 
 # Create an L1 instruction and data cache
-system.cpu.icache = L1ICache(args)
-system.cpu.dcache = L1DCache(args)
+system.cpu.icache = L1ICache()
+system.cpu.dcache = L1DCache()
 
 # Connect the instruction and data caches to the CPU
 system.cpu.icache.connectCPU(system.cpu)
