@@ -6,7 +6,7 @@ class L1Cache(Cache):
     data_latency = 2
     response_latency = 2
     mshrs = 4
-    tgt_per_mshr = 20
+    tgts_per_mshr = 20
 
     def connectCPU(self, cpu):
         # need to define this in a base class
@@ -37,7 +37,7 @@ class L2Cache(Cache):
     data_latency = 20
     response_latency = 20
     mshrs = 20
-    tgt_per_mshr = 12
+    tgts_per_mshr = 12
 
     def connectCPUSideBus(self, cpu):
         self.cpu_side = bus.mem_side_ports

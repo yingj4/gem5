@@ -13,9 +13,6 @@ s.mem_ranges = [AddrRange('512MB')]
 
 s.cpu = X86TimingSimpleCPU()
 
-
-s.membus = SystemXBar()
-
 s.cpu.icache = L1ICache()
 s.cpu.dcache = L1DCache()
 s.cpu.icache.connectCPU(s.cpu)
@@ -25,6 +22,11 @@ s.cpu.dcache.connectCPU(s.cpu)
 s.l2bus = L2XBar()
 s.cpu.icache.connectBus(s.l2bus)
 s.cpu.dcache.connectBus(s.l2bus)
+
+s.l2cache = L2Cache()
+s.l2cache.connectCPUSideBus(s.l2bus)
+s.membus = SystemXBar()
+s.l2cache.connectMemSideBus(s.membus)
 
 s.cpu.createInterruptController()
 s.cpu.interrupts[0].pio = s.membus.mem_side_ports
