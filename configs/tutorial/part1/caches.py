@@ -56,7 +56,7 @@ class L2Cache(Cache):
     tgts_per_mshr = 12
 
     def __init__(self, options = None):
-        super(L2Cache, self).__init__(options)
+        super(L2Cache, self).__init__()
         if not options or not options.l2_size:
             return
         self.l2_size = options.l2_size
