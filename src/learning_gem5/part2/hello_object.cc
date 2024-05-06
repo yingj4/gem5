@@ -1,4 +1,4 @@
-#include "tutorial/part2/hello_object.hh"
+#include "learning_gem5/part2/hello_object.hh"
 
 #include <iostream>
 
