@@ -2,12 +2,12 @@
 #define __LEARNING_GEM5_HELLO_OBJECT_HH__
 
 #include "params/HelloObject.hh"
-#include "sim/sim_objects.hh"
+#include "sim/sim_object.hh"
 
 namespace gem5
 {
 
-class HelloObject : public SimOjbect
+class HelloObject : public SimObject
 {
   public:
     HelloObject(const HelloObjectParams& p);

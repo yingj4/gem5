@@ -5,9 +5,9 @@
 namespace gem5
 {
 
-HelloObject::HelloObject(const HelloObjectParams& params) : SimOjbect(params)
+HelloObject::HelloObject(const HelloObjectParams& params) : SimObject(params)
 {
-    std::cout << "Hello World! from a SimObject" << std::endl;
+    std::cout << "Hello World! From a SimObject!" << std::endl;
 }
 
 } // namespace gem5
