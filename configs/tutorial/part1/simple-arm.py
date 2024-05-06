@@ -10,7 +10,7 @@ s.clk_domain.voltage_domain = VoltageDomain()
 s.mem_mode = 'timing'
 s.mem_ranges = [AddrRange('512MB')]
 
-s.cpu = X86TimingSimpleCPU()
+s.cpu = ArmTimingSimpleCPU()
 
 
 s.membus = SystemXBar()
