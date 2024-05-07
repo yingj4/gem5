@@ -14,6 +14,10 @@ class HelloObject : public SimObject
 
     EventFunctionWrapper event;
 
+    const Tick latency;
+
+    int timesLeft;
+
   public:
     HelloObject(const HelloObjectParams& p);
 

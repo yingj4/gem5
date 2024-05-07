@@ -7,7 +7,7 @@
 namespace gem5
 {
 
-HelloObject::HelloObject(const HelloObjectParams& params) : SimObject(params), event([this]{processEvent();}, name())
+HelloObject::HelloObject(const HelloObjectParams& params) : SimObject(params), event([this]{processEvent();}, name()), latency(100), timesLeft(10)
 {
     // std::cout << "Hello World! From a SimObject!" << std::endl;
     DPRINTF(HelloExample, "Created the hello object\n");
@@ -15,12 +15,21 @@ HelloObject::HelloObject(const HelloObjectParams& params) : SimObject(params), e
 
 void HelloObject::processEvent()
 {
-    DPRINTF(HelloExample, "Hello world! Processing the event\n");
+    // DPRINTF(HelloExample, "Hello world! Processing the event\n");
+
+    --timesLeft;
+    DPRINTF(HelloExample, "Hello world! Processing the event. %d times left\n", timesLeft);
+
+    if (timesLeft <= 0) {
+        DPRINTF(HelloExample, "Done firing!\n");
+    } else {
+        schedule(event, curTick() + latency);
+    }
 }
 
 void HelloObject::startup()
 {
-    schedule(event, 100);
+    schedule(event, latency);
 }
 
 } // namespace gem5
