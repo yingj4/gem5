@@ -9,8 +9,15 @@ namespace gem5
 
 class HelloObject : public SimObject
 {
+  private:
+    void processEvent();
+
+    EventFunctionWrapper event;
+
   public:
     HelloObject(const HelloObjectParams& p);
+
+    void startup() override;
 };
 
 } // namespace gem5
