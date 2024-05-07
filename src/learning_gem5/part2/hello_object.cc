@@ -24,7 +24,7 @@ void HelloObject::processEvent()
 
     if (timesLeft <= 0) {
         DPRINTF(HelloExample, "Done firing!\n");
-        goodbye->sayGoodbye();
+        goodbye->sayGoodbye(myName);
     } else {
         schedule(event, curTick() + latency);
     }
