@@ -6,7 +6,7 @@ root = Root(full_system = False)
 # root.hello = HelloObject()
 # root.hello.time_to_wait = '2us'
 root.hello = HelloObject(time_to_wait = '2us', number_of_fires = 5)
-root.hello.goodbye = GoodbyeObject(buffer_size = '100B')
+root.hello.goodbye_object = GoodbyeObject(buffer_size = '100B')
 
 m5.instantiate()
 
