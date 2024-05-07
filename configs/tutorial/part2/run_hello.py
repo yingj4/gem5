@@ -4,8 +4,10 @@ from m5.objects import *
 root = Root(full_system = False)
 
 root.hello = HelloObject()
-# root.hello.time_to_wait = '2us'
+root.hello.time_to_wait = '2us'
 # root.hello = HelloObject(time_to_wait = '2us')
+
+root.hello.goodbye = GoodbyeObject(buffer_size = '100B')
 
 m5.instantiate()
 

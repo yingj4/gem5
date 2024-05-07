@@ -17,7 +17,7 @@ class GoodbyeObject : public SimObject
      */
     void fillBuffer();
 
-    EventWrapper<GoodbyeObject, &GoodbyeObject::processEvent> event;
+    EventFunctionWrapper event;
 
     /// The bytes processed per tick.
     float bandwidth;

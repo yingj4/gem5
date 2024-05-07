@@ -8,6 +8,8 @@ class HelloObject(SimObject):
 
     time_to_wait = Param.Latency('Time before firing the event')
     number_of_fires = Param.Int(1, 'Number of times to fire the event before goodbye')
+    
+    goodbye_object = Param.GoodbyeObject('A goodbye object')
 
 
 class GoodbyeObject(SimObject):
