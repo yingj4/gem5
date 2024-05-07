@@ -7,7 +7,7 @@
 namespace gem5
 {
 
-HelloObject::HelloObject(const HelloObjectParams& params) : SimObject(params), event([this]{processEvent();}, name()), latency(100), timesLeft(10)
+HelloObject::HelloObject(const HelloObjectParams& params) : SimObject(params), event(*this), myName(params.name) latency(params.time_to_wait), timesLeft(params.number_of_fires)
 {
     // std::cout << "Hello World! From a SimObject!" << std::endl;
     DPRINTF(HelloExample, "Created the hello object\n");

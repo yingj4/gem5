@@ -14,6 +14,8 @@ class HelloObject : public SimObject
 
     EventFunctionWrapper event;
 
+    const std::string myName;
+
     const Tick latency;
 
     int timesLeft;
