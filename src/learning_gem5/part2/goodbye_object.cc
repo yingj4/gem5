@@ -4,6 +4,9 @@
 #include "debug/Hello.hh"
 #include "sim/sim_exit.hh"
 
+namespace gem5
+{
+
 GoodbyeObject::GoodbyeObject(const GoodbyeObjectParams& param) : SimObject(param), event([this]{processEvent();}, name()), bandwidth(params.write_bandwidth), bufferSize(params.buffer_size), buffer(nullptr), bufferUsed(0)
 {
     buffer = new char[bufferSize];
@@ -49,4 +52,6 @@ void GoodbyeObject::fillBuffer()
         // Be sure to take into account the time for the last bytes
         exitSimLoop(buffer, 0, curTick() + bandwidth * bytes_copied);
     }
+}
+
 }
