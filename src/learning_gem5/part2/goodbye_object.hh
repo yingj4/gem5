@@ -6,6 +6,9 @@
 #include "params/GoodbyeObject.hh"
 #include "sim/sim_object.hh"
 
+namespace gem5
+{
+
 class GoodbyeObject : public SimObject
 {
   private:
@@ -46,5 +49,7 @@ class GoodbyeObject : public SimObject
      */
     void sayGoodbye(std::string name);
 };
+
+} // namespace gem5
 
 #endif // __LEARNING_GEM5_GOODBYE_OBJECT_HH__
