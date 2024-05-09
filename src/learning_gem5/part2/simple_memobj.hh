@@ -29,7 +29,15 @@ class SimpleMemobj : public SimObject
         PacketPtr blockedPacket;
 
     public:
-        CPUSidePort(const std::string& name, SimpleMemobj* owner) : SlavePort(name, owner), owner(owner) { }
+        CPUSidePort(const std::string& name, SimpleMemobj* owner) : ResponsePort(name, owner), owner(owner), needRetry(false), blockedPacket(nullptr) { }
+
+        /**
+         * Send a packet across this port. This is called by the owner and
+         * all of the flow control is hanled in this function.
+         *
+         * @param packet to send.
+         */
+        void sendPacket(PacketPtr pkt);
 
         AddrRangeList getAddrRanges() const override;
 
@@ -38,7 +46,6 @@ class SimpleMemobj : public SimObject
          * from the SimpleMemobj whenever it is unblocked.
          */
         void trySendRetry();
-
     
     protected:
         Tick recvAtomic(PacketPtr pkt) override { panic("recvAtomic unimplemented!\n"); }
@@ -53,7 +60,7 @@ class SimpleMemobj : public SimObject
         SimpleMemobj* owner;
     
     public:
-        MemSidePort(const std::string& name, SimpleMemobj* owner) : MasterPort(name, owner). owner(owner) { }
+        MemSidePort(const std::string& name, SimpleMemobj* owner) : RequestPort(name, owner), owner(owner) { }
 
         /**
          * Send a packet across this port. This is called by the owner and
@@ -62,15 +69,6 @@ class SimpleMemobj : public SimObject
          * @param packet to send.
          */
         void sendPacket(PacketPtr pkt);
-
-        /**
-         * Send a packet across this port. This is called by the owner and
-         * all of the flow control is hanled in this function.
-         *
-         * @param packet to send.
-         */
-        void sendPacket(PacketPtr pkt);
-
 
     protected:
         bool recvTimingResp(PacketPtr pkt) override;

@@ -57,7 +57,7 @@ void SimpleMemobj::sendRangeChange()
     dataPort.sendRangeChange();
 }
 
-void SimpleMemobj::CPUSidePort::recvTimingReq(PacketPtr pkt)
+bool SimpleMemobj::CPUSidePort::recvTimingReq(PacketPtr pkt)
 {
     if (!owner->handleRequest(pkt)) {
         needRetry = true;
