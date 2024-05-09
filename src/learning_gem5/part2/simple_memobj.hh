@@ -130,7 +130,7 @@ class SimpleMemobj : public SimObject
   public:
     /** constructor
     */
-    SimpleMemobj(SimpleMemobjParams& p);
+    SimpleMemobj(const SimpleMemobjParams& p);
 
     Port& getPort(const std::string& if_name, PortID idx = InvalidPortID) override;
 };
