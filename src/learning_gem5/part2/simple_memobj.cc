@@ -67,7 +67,7 @@ bool SimpleMemobj::CPUSidePort::recvTimingReq(PacketPtr pkt)
     }
 }
 
-void SimpleMemobj::handleRequest(PacketPtr pkt)
+bool SimpleMemobj::handleRequest(PacketPtr pkt)
 {
     if (blocked) {
         return false;
@@ -96,12 +96,12 @@ void SimpleMemobj::MemSidePort::recvReqRetry()
     sendPacket(pkt);
 }
 
-void SimpleMemobj::MemSidePort::recvTimingResp(PacketPtr pkt)
+bool SimpleMemobj::MemSidePort::recvTimingResp(PacketPtr pkt)
 {
     return owner->handleResponse(pkt);
 }
 
-void SimpleMemobj::handleResponse(PacketPtr pkt)
+bool SimpleMemobj::handleResponse(PacketPtr pkt)
 {
     assert(blocked);
     DPRINTF(SimpleMemobj, "Got response from address %x\n", pkt->getAddr());
@@ -148,9 +148,9 @@ void SimpleMemobj::CPUSidePort::trySendRetry()
     }
 }
 
-SimpleMemobj* SimpleMemobjParams::create()
-{
-    return new SimpleMemobj(this);
-}
+// SimpleMemobj* SimpleMemobjParams::create()
+// {
+//     return new SimpleMemobj(this);
+// }
 
 }

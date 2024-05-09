@@ -59,6 +59,8 @@ class SimpleMemobj : public SimObject
     private:
         SimpleMemobj* owner;
     
+        /// If we tried to send a packet and it was blocked, store it here
+        PacketPtr blockedPacket;
     public:
         MemSidePort(const std::string& name, SimpleMemobj* owner) : RequestPort(name, owner), owner(owner) { }
 
@@ -112,6 +114,11 @@ class SimpleMemobj : public SimObject
      */
     AddrRangeList getAddrRanges() const;
 
+    /**
+     * Tell the CPU side to ask for our memory ranges.
+     */
+    void sendRangeChange();
+
     CPUSidePort instPort;
     CPUSidePort dataPort;
 
@@ -119,8 +126,6 @@ class SimpleMemobj : public SimObject
 
     /// True if this is currently blocked waiting for a response.
     bool blocked;
-
-
 
   public:
     /** constructor
