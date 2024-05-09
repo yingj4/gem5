@@ -9,4 +9,4 @@ class SimpleMemobj(SimObject):
 
     inst_port = ResponsePort('CPU side port, receives requests')
     data_port = ResponsePort('CPU side port, receives requests')
-    mem_port = RequestPort('Memory side port, sends requests')
+    mem_side = RequestPort('Memory side port, sends requests')
