@@ -50,7 +50,7 @@ class SimpleMemobj : public SimObject
     protected:
         Tick recvAtomic(PacketPtr pkt) override { panic("recvAtomic unimplemented!\n"); }
         void recvFunctional(PacketPtr pkt) override;
-        void recvTimingReq(PacketPtr pkt) override;
+        bool recvTimingReq(PacketPtr pkt) override;
         void recvRespRetry() override;
     };
 

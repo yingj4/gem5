@@ -8,4 +8,4 @@ Source('goodbye_object.cc')
 Source('simple_memobj.cc')
 
 DebugFlag('Hello')
-DebugFlag('SimpleMemObj')
+DebugFlag('SimpleMemobj')
