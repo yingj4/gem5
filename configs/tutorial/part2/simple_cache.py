@@ -4,14 +4,14 @@ from m5.objects import *
 s = System()
 
 s.clk_domain = SrcClockDomain()
-s.clk_domain.clock = "1GHz"
+s.clk_domain.clock = '1GHz'
 s.clk_domain.voltage_domain = VoltageDomain()
-s.mem_mode = "timing"
-s.mem_ranges = [AddrRange("512MB")]
+s.mem_mode = 'timing'
+s.mem_ranges = [AddrRange('512MB')]
 
 s.cpu = X86TimingSimpleCPU()
 
-s.cache = SimpleCache(size="128kB")
+s.cache = SimpleCache(size='1kB')
 
 s.cpu.icache_port = s.cache.cpu_side
 s.cpu.dcache_port = s.cache.cpu_side
@@ -33,9 +33,7 @@ s.mem_ctrl.port = s.membus.mem_side_ports
 s.system_port = s.membus.cpu_side_ports
 
 thispath = os.path.dirname(os.path.realpath(__file__))
-binary = os.path.join(
-    thispath, "../../../", "tests/test-progs/hello/bin/x86/linux/hello"
-)
+binary = os.path.join(thispath, '../../../', 'tests/test-progs/hello/bin/x86/linux/hello')
 # binary = "/home/gem5/tests/test-progs/hello/bin/x86/linux/hello"
 
 s.workload = SEWorkload.init_compatible(binary)
@@ -46,10 +44,10 @@ s.cpu.workload = process
 s.cpu.createThreads()
 
 
-root = Root(full_system=False, system=s)
+root = Root(full_system = False, system = s)
 m5.instantiate()
 
 
-print(f"Beginning simulation!")
+print(f'Beginning simulation!')
 exit_event = m5.simulate()
-print(f"Exiting @ tick {m5.curTick()} because {exit_event.getCause()}")
+print(f'Exiting @ tick {m5.curTick()} because {exit_event.getCause()}')
