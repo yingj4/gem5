@@ -13,8 +13,8 @@ s.cpu = X86TimingSimpleCPU()
 
 s.cache = SimpleCache(size='1kB')
 
-s.cpu.icache_port = s.cache.cpu_side_ports
-s.cpu.dcache_port = s.cache.cpu_side_ports
+s.cpu.icache_port = s.cache.cpu_side
+s.cpu.dcache_port = s.cache.cpu_side
 
 s.membus = SystemXBar()
 
