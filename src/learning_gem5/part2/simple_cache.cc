@@ -9,7 +9,7 @@ namespace gem5
 {
 
 SimpleCache::SimpleCache(const SimpleCacheParams& params) : ClockedObject(params), latency(params.latency), blockSize(params.system->cacheLineSize()), capacity(params.size / blockSize), memPort(params.name + ".mem_port", this), blocked(false),
-                                                            originalPacket(nullptr), waitingPortId(-1), stat(this)
+                                                            originalPacket(nullptr), waitingPortId(-1), stats(this)
 {
     for (int i = 0; i < params.port_cpu_side_connection_count; ++i) {
         cpuPorts.emplace_back(name() + csprintf(".cpu_side[%d]", i), i, this);
@@ -20,7 +20,7 @@ Port& SimpleCache::getPort(const std::string& if_name, PortID idx)
 {
     if (if_name == "mem_side") {
         panic_if(idx != InvalidPortID, "Memory side of simple cache is not a vector port\n");
-        return mem_port;
+        return memPort;
     } else if (if_name == "cpu_side" and idx < cpuPorts.size()) {
         return cpuPorts[idx];
     } else {
@@ -59,7 +59,7 @@ void SimpleCache::CPUSidePort::recvFunctional(PacketPtr pkt)
     return owner->handleFunctional(pkt);
 }
 
-bool SimpleCache::CPUSidePort::recvTimingReq(PacketPtr, pkt)
+bool SimpleCache::CPUSidePort::recvTimingReq(PacketPtr pkt)
 {
     DPRINTF(SimpleCache, "Got request %s\n", pkt->print());
 
@@ -137,7 +137,7 @@ bool SimpleCache::handleRequest(PacketPtr pkt, int port_id)
     assert(waitingPortId == -1);
     waitingPortId = port_id;
 
-    schedule(new EventFunctionWrapper([this, pkt]{ accessTiming(pkt); }, name + ".accessEvent", true)), clockEdge(latency);
+    schedule(new EventFunctionWrapper([this, pkt]{ accessTiming(pkt); }, name() + ".accessEvent", true)), clockEdge(latency);
 
     return true;
 }
@@ -244,7 +244,7 @@ void SimpleCache::accessTiming(PacketPtr pkt)
 bool SimpleCache::accessFunctional(PacketPtr pkt)
 {
     Addr block_addr = pkt->getBlockAddr(blockSize);
-    audo it = cacheStore.find(block_addr);
+    auto it = cacheStore.find(block_addr);
 
     if (it != cacheStore.end()) {
         if (pkt->isWrite()) {
@@ -310,7 +310,7 @@ void SimpleCache::sendRangeChange() const
     }
 }
 
-SimpleCache::SimpleCacheStats::SimpleCacheStats(statistics::Group* parent) : statistics::Group(parent), ADD_STAT(hits, statistics::units::Count()::get, "Number of hits\n"), ADD_STAT(misses, statistics::units::Count()::get, "Number of misses\n"),
+SimpleCache::SimpleCacheStats::SimpleCacheStats(statistics::Group* parent) : statistics::Group(parent), ADD_STAT(hits, statistics::units::Count::get(), "Number of hits\n"), ADD_STAT(misses, statistics::units::Count::get(), "Number of misses\n"),
                                                                                 ADD_STAT(missLatency, statistics::units::Tick::get(), "Ticks for misses to a cache\n"),
                                                                                 ADD_STAT(hitRatio, statistics::units::Ratio::get(), "The hit ratio in the cache\n", hits / (hits + misses))
 {
