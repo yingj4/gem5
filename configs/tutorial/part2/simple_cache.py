@@ -13,12 +13,12 @@ s.cpu = X86TimingSimpleCPU()
 
 s.cache = SimpleCache(size='1kB')
 
-s.cpu.icache_port = s.memobj.inst_port
-s.cpu.dcache_port = s.memobj.data_port
+s.cpu.icache_port = s.cache.cpu_side_ports
+s.cpu.dcache_port = s.cache.cpu_side_ports
 
 s.membus = SystemXBar()
 
-s.memobj.mem_side = s.membus.cpu_side_ports
+s.cache.mem_side = s.membus.cpu_side_ports
 
 s.cpu.createInterruptController()
 s.cpu.interrupts[0].pio = s.membus.mem_side_ports

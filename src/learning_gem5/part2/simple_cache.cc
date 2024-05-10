@@ -137,7 +137,7 @@ bool SimpleCache::handleRequest(PacketPtr pkt, int port_id)
     assert(waitingPortId == -1);
     waitingPortId = port_id;
 
-    schedule(new EventFunctionWrapper([this, pkt]{ accessTiming(pkt); }, name() + ".accessEvent", true)), clockEdge(latency);
+    schedule(new EventFunctionWrapper([this, pkt]{ accessTiming(pkt); }, name() + ".accessEvent", true), clockEdge(latency));
 
     return true;
 }
