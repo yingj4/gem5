@@ -3,7 +3,7 @@
 #include "base/compiler.hh"
 #include "base/random.hh"
 #include "debug/SimpleCache.hh"
-#include "sime/system.hh"
+#include "sim/system.hh"
 
 namespace gem5
 {
