@@ -1,6 +1,5 @@
 Import('*')
 
-# NOTE: All SLICC setup code found in src/mem/ruby/protocol/SConscript
+main.Append(ALL_PROTOCOLS = ['MSI'])
 
-# Add this directory to the search path for SLICC
-main.Append(PROTOCOL_DIRS=[Dir('.')])
+main.Append(PROTOCOL_DIRS = [Dir('.')])
