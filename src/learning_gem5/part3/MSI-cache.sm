@@ -11,14 +11,14 @@ machine(MachineType:L1Cache, "MSI cache")
 
     MessageBuffer* mandatoryQueue;
 {
-    state_declaration(Stat, desc = "Cache states") {
+    state_declaration(State, desc = "Cache states") {
         // State I
         I,      AccessPermission:Invalid, desc = "Not present/Invalid";
 
         // States moving out of I
-        IS_D,   AccessPermission:Invalid, desc = "Invalid, moving to S, waiting for data";
-        IM_AD,  AccessPermission:Invalid, desc = "Invalid, moving to M, waiting for acks and data";
-        IM_A,   AccessPermission:Busy, desc = "Invalid, moving to M, waiting for acks";
+        IS_D,   AccessPermission:Invalid,   desc = "Invalid, moving to S, waiting for data";
+        IM_AD,  AccessPermission:Invalid,   desc = "Invalid, moving to M, waiting for acks and data";
+        IM_A,   AccessPermission:Busy,      desc = "Invalid, moving to M, waiting for acks";
 
         // State S
         S,      AccessPermission:Read_Only, desc = "Shared, Read-only, other caches may have the block";
