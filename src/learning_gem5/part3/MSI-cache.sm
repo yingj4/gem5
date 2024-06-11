@@ -180,7 +180,6 @@ machine(MachineType:L1Cache, "MSI cache")
             return 1;
         }
         
-        
         return 0;
     }
 
