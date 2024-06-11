@@ -33,7 +33,7 @@
 //         // States moving to Invalid
 //         MI_A,   AccessPermission:Busy, desc = "Was modified, moving to I, waiting for put ack";
 //         SI_A,   AccessPermission:Busy, desc = "Was shared, moving to I, waiting for put ack";
-//         II_A,   AccessPermission:Busy, desc = "Sent valid data before receiving put ack, waiting for put ack";
+//         II_A,   AccessPermission:Invalid, desc = "Sent valid data before receiving put ack, waiting for put ack";
 //     }
 
 //     enumeration(Event, desc = "Cache events") {
