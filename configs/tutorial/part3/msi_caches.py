@@ -177,7 +177,7 @@ class MyCacheSystem(RubySystem):
         # Create one sequencer per CPU. In many systems this is more
         # complicated since you have to create sequencers for DMA controllers
         # and other controllers, too.
-        self.sequencers = [RubySequencer(version = i, dcache = self.controllers[i].cacheMemory, clk_domain = self.controllers[i].clk_domain) for i in range(len(cpus))]
+        self.sequencers = [RubySequencer(version = i, dcache = self.controllers[i].cacheMemory, clk_domain = self.controllers[i].clk_domain,) for i in range(len(cpus))]
 
         # We know that we put the controllers in an order such that the first
         # N of them are the L1 caches which need a sequencer pointer
