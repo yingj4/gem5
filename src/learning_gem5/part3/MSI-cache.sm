@@ -160,13 +160,13 @@ machine(MachineType:L1Cache, "MSI cache")
             } else {
                 return 0;
             }
+        } else {
+            if (testAndWrite(addr, getCacheEntry(addr).DataBlk, pkt)) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
-
-        if (testAndWrite(addr, getCacheEntry(addr).DataBlk, pkt)) {
-            return 1;
-        }
-
-        return 0;
     }
 
 
@@ -308,7 +308,7 @@ machine(MachineType:L1Cache, "MSI cache")
         }
     }
 
-    action(sendPutM, "pM", desc = "Send PutM to the directory") {
+    action(sendPutM, "pM", desc = "Send PutM+data to the directory") {
         enqueue(request_out, RequestMsg, 1) {
             out_msg.addr := address;
             out_msg.Type := CoherenceRequestType:PutM;
@@ -446,11 +446,11 @@ machine(MachineType:L1Cache, "MSI cache")
         unset_tbe();
     }
 
-    action(copyDataFromCacheToTBE, "Dct", desc = "Copy data from cache to TBE") {
-        assert(is_valid(cache_entry));
-        assert(is_valid(tbe));
-        tbe.DataBlk := cache_entry.DataBlk;
-    }
+    // action(copyDataFromCacheToTBE, "Dct", desc = "Copy data from cache to TBE") {
+    //     assert(is_valid(cache_entry));
+    //     assert(is_valid(tbe));
+    //     tbe.DataBlk := cache_entry.DataBlk;
+    // }
 
     // Queue management actions
     action(popMandatoryQueue, "pQ", desc = "Pop the mandatory queue") {
@@ -496,6 +496,13 @@ machine(MachineType:L1Cache, "MSI cache")
         // Actually send the request to the directory
         sendGetS;
         // Since we have handled this request on the mandatory queue, we can pop
+        popMandatoryQueue;
+    }
+
+    transition(I, Store, IM_AD) {
+        allocateCacheBlock;
+        allocateTBE;
+        sendGetM;
         popMandatoryQueue;
     }
 
