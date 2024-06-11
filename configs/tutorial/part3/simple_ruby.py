@@ -43,7 +43,7 @@ system.caches.setup(system, system.cpu, [system.mem_ctrl])
 # system.mem_ctrl.port = system.membus.mem_side_ports
 
 thispath = os.path.dirname(os.path.realpath(__file__))
-binary = os.path.join(thispath, "../../../", "tests/test-progs/hello/bin/x86/linux/threads")
+binary = os.path.join(thispath, "../../../", "tests/test-progs/threads/bin/x86/linux/threads")
 # binary = "/home/gem5/tests/test-progs/hello/bin/x86/linux/threads"
 
 system.workload = SEWorkload.init_compatible(binary)
