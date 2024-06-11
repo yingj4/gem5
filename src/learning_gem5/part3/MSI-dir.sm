@@ -283,6 +283,7 @@ machine(MachineType:Directory, "Directory protocol")
     }
 
     action(clearOwner, "cO", desc="Clear the owner") {
+        assert(getDirectoryEntry(address).Sharers.count() == 0);
         getDirectoryEntry(address).Owner.clear();
     }
 
