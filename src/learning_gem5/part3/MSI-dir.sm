@@ -496,62 +496,90 @@
 
 machine(MachineType:Directory, "Directory protocol")
     :
-    DirectoryMemory* directory;
-    Cycles toMemLatency := 1;
+      // This "DirectoryMemory" is a little weird. It is initially allocated
+      // so that it *can* cover all of memory (i.e., there are pointers for
+      // every 64-byte block in memory). However, the entries are lazily
+      // created in getDirEntry()
+      DirectoryMemory * directory;
+      // You can put any parameters you want here. They will be exported as
+      // normal SimObject parameters (like in the SimObject description file)
+      // and you can set these parameters at runtime via the python config
+      // file. If there is no default here (like directory), it is mandatory
+      // to set the parameter in the python config. Otherwise, it uses the
+      // default value set here.
+      Cycles toMemLatency := 1;
 
-    MessageBuffer* forwardToCache, network = "To", virtual_network = "1", vnet_type = "forward";
-    MessageBuffer* responseToCache, network = "To", virtual_network = "2", vnet_type = "response";
-    MessageBuffer* requestFromCache, network = "From", virtual_network = "0", vnet_type = "request";
-    MessageBuffer* responseFromCache, network = "From", virtual_network = "2", vnet_type = "response";
+    // Forwarding requests from the directory *to* the caches.
+    MessageBuffer *forwardToCache, network="To", virtual_network="1",
+          vnet_type="forward";
+    // Response from the directory *to* the cache.
+    MessageBuffer *responseToCache, network="To", virtual_network="2",
+          vnet_type="response";
 
-    MessageBuffer* requestToMemory;
-    MessageBuffer* responseFromMemory;
+    // Requests *from* the cache to the directory
+    MessageBuffer *requestFromCache, network="From", virtual_network="0",
+          vnet_type="request";
+
+    // Responses *from* the cache to the directory
+    MessageBuffer *responseFromCache, network="From", virtual_network="2",
+          vnet_type="response";
+
+    // Special buffer for memory requests. Kind of like the mandatory queue
+    MessageBuffer *requestToMemory;
+
+    // Special buffer for memory responses. Kind of like the mandatory queue
+    MessageBuffer *responseFromMemory;
+
 {
-    state_declaration(State, desc = "Directory states", default = "Directory_State_I") {
+    // For many things in SLICC you can specify a default. However, this
+    // default must use the C++ name (mangled SLICC name). For the state below
+    // you have to use the controller name and the name we use for states.
+    state_declaration(State, desc="Directory states",
+                      default="Directory_State_I") {
         // Stable states.
         // NOTE: Thise are "cache-centric" states like in Sorin et al.
         // However, The access permissions are memory-centric.
-        I, AccessPermission:Read_Write, desc = "Invalid in the caches.";
-        S, AccessPermission:Read_Only,  desc = "At least one cache has the blk";
-        M, AccessPermission:Invalid,    desc = "A cache has the block in M";
+        I, AccessPermission:Read_Write,  desc="Invalid in the caches.";
+        S, AccessPermission:Read_Only,   desc="At least one cache has the blk";
+        M, AccessPermission:Invalid,     desc="A cache has the block in M";
 
         // Transient states
-        S_D, AccessPermission:Busy,     desc = "Moving to S, but need data";
+        S_D, AccessPermission:Busy,      desc="Moving to S, but need data";
 
         // Waiting for data from memory
-        S_m, AccessPermission:Read_Write,   desc = "In S waiting for mem";
-        M_m, AccessPermission:Read_Write,   desc = "Moving to M waiting for mem";
+        S_m, AccessPermission:Read_Write, desc="In S waiting for mem";
+        M_m, AccessPermission:Read_Write, desc="Moving to M waiting for mem";
 
         // Waiting for write-ack from memory
-        MI_m, AccessPermission:Busy,    desc = "Moving to I waiting for ack";
-        SS_m, AccessPermission:Busy,    desc = "Moving to S waiting for ack";
+        MI_m, AccessPermission:Busy,       desc="Moving to I waiting for ack";
+        SS_m, AccessPermission:Busy,       desc="Moving to S waiting for ack";
     }
 
-    enumeration(Event, desc = "Directory events") {
+    enumeration(Event, desc="Directory events") {
         // Data requests from the cache
-        GetS,   desc = "Request for read-only data from cache";
-        GetM,   desc = "Request for read-write data from cache";
+        GetS,         desc="Request for read-only data from cache";
+        GetM,         desc="Request for read-write data from cache";
 
         // Writeback requests from the cache
-        PutSNotLast,    desc = "PutS and the block has other sharers";
-        PutSLast,       desc = "PutS and the block has no other sharers";
-        PutMOwner,      desc = "Dirty data writeback from the owner";
-        PutMNonOwner,   desc = "Dirty data writeback from non-owner";
+        PutSNotLast,  desc="PutS and the block has other sharers";
+        PutSLast,     desc="PutS and the block has no other sharers";
+        PutMOwner,    desc="Dirty data writeback from the owner";
+        PutMNonOwner, desc="Dirty data writeback from non-owner";
 
         // Cache responses
-        Data,   desc = "Response to fwd request with data";
+        Data,         desc="Response to fwd request with data";
 
         // From Memory
-        MemData,    desc = "Data from memory";
-        MemAck,     desc = "Ack from memory that write is complete";
+        MemData,      desc="Data from memory";
+        MemAck,       desc="Ack from memory that write is complete";
     }
 
     // NOTE: We use a netdest for the sharers and the owner so we can simply
     // copy the structure into the message we send as a response.
-    structure(Entry, desc = "...", interface = "AbstractCacheEntry", main = "false") {
-        State DirState,     desc = "Directory state";
-        NetDest Sharers,    desc = "Sharers for this block";
-        NetDest Owner,      desc = "Owner of this block";
+    structure(Entry, desc="...", interface="AbstractCacheEntry", main="false") {
+        State DirState,         desc="Directory state";
+        NetDest Sharers,        desc="Sharers for this block";
+        NetDest Owner,          desc="Owner of this block";
     }
 
     Tick clockEdge();
@@ -561,12 +589,11 @@ machine(MachineType:Directory, "Directory protocol")
     // since this is lazily populated.
     Entry getDirectoryEntry(Addr addr), return_by_pointer = "yes" {
         Entry dir_entry := static_cast(Entry, "pointer", directory[addr]);
-        
         if (is_invalid(dir_entry)) {
             // This first time we see this address allocate an entry for it.
-            dir_entry := static_cast(Entry, "pointer", directory.allocate(addr, new Entry));
+            dir_entry := static_cast(Entry, "pointer",
+                                     directory.allocate(addr, new Entry));
         }
-
         return dir_entry;
     }
 
@@ -575,6 +602,7 @@ machine(MachineType:Directory, "Directory protocol")
     // in this implementation.
     // NOTE: we don't have TBE in this machine, so we don't need to pass it
     // to these overridden functions.
+
     State getState(Addr addr) {
         if (directory.isPresent(addr)) {
             return getDirectoryEntry(addr).DirState;
@@ -591,22 +619,23 @@ machine(MachineType:Directory, "Directory protocol")
                 assert(getDirectoryEntry(addr).Sharers.count() == 0);
             }
             getDirectoryEntry(addr).DirState := state;
-            if (state == State:I) {
+            if (state == State:I)  {
                 assert(getDirectoryEntry(addr).Owner.count() == 0);
                 assert(getDirectoryEntry(addr).Sharers.count() == 0);
             }
         }
     }
 
+    // This is really the access permissions of memory.
+    // TODO: I don't understand this at the directory.
     AccessPermission getAccessPermission(Addr addr) {
         if (directory.isPresent(addr)) {
             Entry e := getDirectoryEntry(addr);
             return Directory_State_to_permission(e.DirState);
-        } else {
+        } else  {
             return AccessPermission:NotPresent;
         }
     }
-
     void setAccessPermission(Addr addr, State state) {
         if (directory.isPresent(addr)) {
             Entry e := getDirectoryEntry(addr);
@@ -614,12 +643,12 @@ machine(MachineType:Directory, "Directory protocol")
         }
     }
 
-    void functionalRead(Addr addr, Packet* pkt) {
+    void functionalRead(Addr addr, Packet *pkt) {
         functionalMemoryRead(pkt);
     }
 
     // This returns the number of writes. So, if we write then return 1
-    int functionalWrite(Addr addr, Packet* pkt) {
+    int functionalWrite(Addr addr, Packet *pkt) {
         if (functionalMemoryWrite(pkt)) {
             return 1;
         } else {
@@ -627,9 +656,10 @@ machine(MachineType:Directory, "Directory protocol")
         }
     }
 
-    
+
     /*************************************************************************/
     // Network ports
+
     out_port(forward_out, RequestMsg, forwardToCache);
     out_port(response_out, ResponseMsg, responseToCache);
     out_port(memQueue_out, MemoryMsg, requestToMemory);
@@ -664,7 +694,6 @@ machine(MachineType:Directory, "Directory protocol")
         if (request_in.isReady(clockEdge())) {
             peek(request_in, RequestMsg) {
                 Entry entry := getDirectoryEntry(in_msg.addr);
-
                 if (in_msg.Type == CoherenceRequestType:GetS) {
                     // NOTE: Since we don't have a TBE in this machine, there
                     // is no need to pass a TBE into trigger. Also, for the
@@ -696,6 +725,7 @@ machine(MachineType:Directory, "Directory protocol")
     }
 
 
+
     /*************************************************************************/
     // Actions
 
@@ -720,7 +750,6 @@ machine(MachineType:Directory, "Directory protocol")
         peek(request_in, RequestMsg) {
             DPRINTF(RubySlicc, "Writing memory for %#x\n", address);
             DPRINTF(RubySlicc, "Writing %s\n", in_msg.DataBlk);
-
             enqueue(memQueue_out, MemoryMsg, toMemLatency) {
                 out_msg.addr := address;
                 out_msg.Type := MemoryRequestType:MEMORY_WB;
@@ -736,7 +765,6 @@ machine(MachineType:Directory, "Directory protocol")
         peek(response_in, ResponseMsg) {
             DPRINTF(RubySlicc, "Writing memory for %#x\n", address);
             DPRINTF(RubySlicc, "Writing %s\n", in_msg.DataBlk);
-
             enqueue(memQueue_out, MemoryMsg, toMemLatency) {
                 out_msg.addr := address;
                 out_msg.Type := MemoryRequestType:MEMORY_WB;
@@ -779,7 +807,6 @@ machine(MachineType:Directory, "Directory protocol")
     }
 
     action(clearOwner, "cO", desc="Clear the owner") {
-        assert(getDirectoryEntry(address).Sharers.count() == 0);
         getDirectoryEntry(address).Owner.clear();
     }
 
@@ -799,7 +826,6 @@ machine(MachineType:Directory, "Directory protocol")
 
     action(sendFwdGetS, "fS", desc="Send forward getS to owner") {
         assert(getDirectoryEntry(address).Owner.count() == 1);
-
         peek(request_in, RequestMsg) {
             enqueue(forward_out, RequestMsg, 1) {
                 out_msg.addr := address;
@@ -813,7 +839,6 @@ machine(MachineType:Directory, "Directory protocol")
 
     action(sendFwdGetM, "fM", desc="Send forward getM to owner") {
         assert(getDirectoryEntry(address).Owner.count() == 1);
-
         peek(request_in, RequestMsg) {
             enqueue(forward_out, RequestMsg, 1) {
                 out_msg.addr := address;
@@ -829,6 +854,7 @@ machine(MachineType:Directory, "Directory protocol")
 
     // This also needs to send along the number of sharers!!!!
     action(sendDataToReq, "d", desc="Send data from memory to requestor. ") {
+                                    //"May need to send sharer number, too") {
         peek(memQueue_in, MemoryMsg) {
             enqueue(response_out, ResponseMsg, 1) {
                 out_msg.addr := address;
@@ -837,16 +863,13 @@ machine(MachineType:Directory, "Directory protocol")
                 out_msg.Destination.add(in_msg.OriginalRequestorMachId);
                 out_msg.DataBlk := in_msg.DataBlk;
                 out_msg.MessageSize := MessageSizeType:Data;
-
                 Entry e := getDirectoryEntry(address);
-
                 // Only need to include acks if we are the owner.
                 if (e.Owner.isElement(in_msg.OriginalRequestorMachId)) {
                     out_msg.Acks := e.Sharers.count();
                 } else {
                     out_msg.Acks := 0;
                 }
-
                 assert(out_msg.Acks >= 0);
             }
         }
@@ -865,6 +888,7 @@ machine(MachineType:Directory, "Directory protocol")
     }
 
     // Queue management
+
     action(popResponseQueue, "pR", desc="Pop the response queue") {
         response_in.dequeue(clockEdge());
     }
@@ -882,8 +906,10 @@ machine(MachineType:Directory, "Directory protocol")
         // Do nothing.
     }
 
+
     /*************************************************************************/
     // transitions
+
     transition({I, S}, GetS, S_m) {
         sendMemRead;
         addReqToSharers;
@@ -908,7 +934,7 @@ machine(MachineType:Directory, "Directory protocol")
 
     transition(M_m, MemData, M) {
         sendDataToReq;
-        clearSharers;   // NOTE: This isn't *required* in some cases.
+        clearSharers; // NOTE: This isn't *required* in some cases.
         popMemQueue;
     }
 
