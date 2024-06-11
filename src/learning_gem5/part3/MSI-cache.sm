@@ -154,19 +154,34 @@ machine(MachineType:L1Cache, "MSI cache")
     int functionalWrite(Addr addr, Packet* pkt) {
         TBE tbe := TBEs[addr];
 
+        // if (is_valid(tbe)) {
+        //     if (testAndWrite(addr, tbe.DataBlk, pkt)) {
+        //         return 1;
+        //     } else {
+        //         return 0;
+        //     }
+        // } else {
+        //     if (testAndWrite(addr, getCacheEntry(addr).DataBlk, pkt)) {
+        //         return 1;
+        //     } else {
+        //         return 0;
+        //     }
+        // }
+
         if (is_valid(tbe)) {
             if (testAndWrite(addr, tbe.DataBlk, pkt)) {
                 return 1;
             } else {
                 return 0;
             }
-        } else {
-            if (testAndWrite(addr, getCacheEntry(addr).DataBlk, pkt)) {
-                return 1;
-            } else {
-                return 0;
-            }
         }
+            
+        if (testAndWrite(addr, getCacheEntry(addr).DataBlk, pkt)) {
+            return 1;
+        }
+        
+        
+        return 0;
     }
 
 
