@@ -10,7 +10,7 @@ from m5.util import (
 class MyCacheSystem(RubySystem):
     def __init__(self):
         if buildEnv["PROTOCOL"] != "MI_example":
-            print(buildEnv["PROTOCOL"])
+            print('\n' + buildEnv["PROTOCOL"])
             fatal("This system assumes MI from learning gem5!")
         
         super().__init__()
